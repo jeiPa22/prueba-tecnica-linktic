@@ -42,5 +42,9 @@ describe('inventory api hooks', () => {
     const payload = { productId: 'p1', quantity: 2 }
     const result = await mutationFn(payload)
     expect(result).toEqual({ calledWith: expect.stringContaining('/api/v1/inventory/purchase') })
+    // simulate onSuccess behaviour to cover invalidation calls
+    if (typeof captured.mutation.onSuccess === 'function') {
+      captured.mutation.onSuccess(result, payload)
+    }
   })
 })
