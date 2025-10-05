@@ -57,3 +57,8 @@ El frontend es una aplicación de React creada con Vite.
     ```
 
 La aplicación estará disponible en la URL que indique Vite en la terminal (generalmente `http://localhost:5173`).
+
+Tambien Se utiliza para ambos entornos back y front arquitectura hexagonal.
+aqui un ejemplo generarl de que debe tener en cuenta para usarla.
+<img width="995" height="732" alt="image" src="https://github.com/user-attachments/assets/0f141c82-65dc-4db6-9087-379acf451f72" />
+
