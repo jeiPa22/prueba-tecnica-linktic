@@ -36,6 +36,18 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     }
 
     /**
+     * Omite el filtrado para ciertas rutas (documentación y salud)
+     */
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String p = request.getRequestURI();
+        return p.startsWith("/v3/api-docs")
+                || p.startsWith("/swagger-ui")
+                || p.equals("/swagger-ui.html")
+                || p.startsWith("/actuator/health");
+    }
+
+    /**
      * Filtra las solicitudes entrantes para verificar la clave API
      */
     @Override
@@ -46,7 +58,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/vnd.api+json");
             response.getWriter().write("""
-                    {"errors":[{"status":"401","title":"No autorizado","detail":"Clave API inválida"}]}
+                    {"errors":[{"status":"401","title":"No autorizado","detail":"Clave API invalida"}]}
                     """);
             return;
         }
