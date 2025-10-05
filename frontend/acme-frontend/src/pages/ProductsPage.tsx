@@ -1,29 +1,65 @@
-import { Container, Grid, Alert, CircularProgress, Box } from "@mui/material";
+// src/pages/ProductsPage.tsx
+import { useMemo, useState } from "react";
+import { Container, Alert, CircularProgress } from "@mui/material";
+import type { GridPaginationModel, GridRowParams } from "@mui/x-data-grid";
 import { useProducts } from "../entities/product/api/products";
-import { ProductCard } from "../entities/product/ui/ProductCard";
+import ProductsTable from "../entities/product/ui/ProductsTable";
+import type { ProductResource } from "../entities/product/model/types";
+import { ProductDetailDrawer } from "../entities/product/ui/ProductDetailDrawer";
 
-/**
- * Página para mostrar productos.
- * @returns Página de productos.
- */
+type JsonApiDocMany<T> = { data: T[]; links?: any; meta?: any };
+
 export default function ProductsPage() {
-  const { data, isLoading, isError } = useProducts({ page: 1, size: 12 });
+  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
+    page: 0,
+    pageSize: 12,
+  });
+  const [selected, setSelected] = useState<string | null>(null);
+
+  const apiPage = paginationModel.page + 1;
+  const apiSize = paginationModel.pageSize;
+
+  const { data, isLoading, isError, isFetching } = useProducts({
+    page: apiPage,
+    size: apiSize,
+  });
+
+  const rows = useMemo(() => {
+    const list =
+      (data as JsonApiDocMany<ProductResource> | undefined)?.data ?? [];
+    return list.map((r) => ({
+      id: r.id,
+      name: r.attributes.name,
+      price: r.attributes.price,
+      currency: r.attributes.currency,
+      status: r.attributes.status,
+    }));
+  }, [data]);
+
+  const rowCount =
+    (data as JsonApiDocMany<ProductResource> | undefined)?.meta?.total ??
+    rows.length;
 
   if (isLoading) return <CircularProgress />;
   if (isError)
     return <Alert severity="error">No fue posible cargar productos</Alert>;
 
-  const items = Array.isArray(data?.data) ? data!.data : [];
-
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
-      <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-        {items.map((it) => (
-          <Grid key={it.id} size={{ xs: 12, sm: 6, md: 8, lg: 8 }}>
-            <ProductCard item={it} />
-          </Grid>
-        ))}
-      </Grid>
+      <h1>Listado de Productos</h1>
+      <ProductsTable
+        rows={rows}
+        rowCount={rowCount}
+        loading={isLoading || isFetching}
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
+        onRowClick={(p: GridRowParams) => setSelected(String(p.id))}
+      />
+      <ProductDetailDrawer
+        open={!!selected}
+        productId={selected}
+        onClose={() => setSelected(null)}
+      />
     </Container>
   );
 }
