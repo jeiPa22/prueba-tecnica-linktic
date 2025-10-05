@@ -1,0 +1,49 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: acme/inventory-service:latest
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Spring DataSource
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+      # Puerto de la app
+      SERVER_PORT: "8081"
+
+      # Flyway: aislar esquema e historial para evitar conflicto con otros MS
+      SPRING_FLYWAY_DEFAULT_SCHEMA: inventory
+      SPRING_FLYWAY_SCHEMAS: inventory
+      SPRING_FLYWAY_CREATE_SCHEMAS: "true"
+      SPRING_FLYWAY_TABLE: flyway_schema_history_inventory
+
+      # Swagger/OpenAPI (opcional)
+      SPRINGDOC_API_DOCS_ENABLED: "true"
+      SPRINGDOC_SWAGGER_UI_ENABLED: "true"
+
+      # API Key (si usas el mismo esquema de seguridad)
+      PRODUCTS_API_KEY: products-secret
+    ports:
+      - "8081:8081"
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 20s
+      retries: 5
+    ports:
+      - "5432:5432"
+
+volumes:
+  db:

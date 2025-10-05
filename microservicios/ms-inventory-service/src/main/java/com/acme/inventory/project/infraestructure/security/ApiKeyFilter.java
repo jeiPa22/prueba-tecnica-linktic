@@ -3,8 +3,9 @@ package com.acme.inventory.project.infraestructure.security;
 import java.io.IOException;
 import java.util.Objects;
 
-import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -14,66 +15,41 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public class ApiKeyFilter extends OncePerRequestFilter {
-    /**
-     * El nombre del encabezado HTTP donde se espera la clave API
-     */
     private final String headerName;
-    /**
-     * La clave API esperada para autenticación
-     */
     private final String expected;
 
-    /**
-     * Constructor que inicializa el filtro con el nombre del encabezado y la clave
-     * esperada
-     *
-     * @param headerName El nombre del encabezado HTTP
-     * @param expected   La clave API esperada
-     */
     public ApiKeyFilter(String headerName, String expected) {
         this.headerName = headerName;
         this.expected = expected;
     }
 
-    /**
-     * Omite el filtrado para ciertas rutas (documentación y salud)
-     */
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
+    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
         String p = request.getRequestURI();
-        return p.startsWith("/v3/api-docs")
-                || p.startsWith("/swagger-ui")
-                || p.equals("/swagger-ui.html")
-                || p.startsWith("/actuator/health");
+        return p.startsWith("/v3/api-docs") || p.startsWith("/swagger-ui") || p.equals("/swagger-ui.html")
+                || p.startsWith("/actuator/health") || p.startsWith("/actuator/info");
     }
 
-    /**
-     * Filtra las solicitudes entrantes para verificar la clave API
-     */
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+            @NonNull FilterChain chain)
             throws ServletException, IOException {
-        var provided = request.getHeader(headerName);
+
+        String provided = request.getHeader(headerName);
+
         if (!Objects.equals(provided, expected)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/vnd.api+json");
-            response.getWriter().write("""
-                    {"errors":[{"status":"401","title":"No autorizado","detail":"Clave API invalida"}]}
-                    """);
+            response.getWriter().write(
+                    "{\"errors\":[{\"status\":\"401\",\"title\":\"No autorizado\",\"detail\":\"Clave API inválida o ausente\"}]}");
             return;
         }
-        Authentication auth = new AbstractAuthenticationToken(AuthorityUtils.NO_AUTHORITIES) {
-            @Override
-            public Object getCredentials() {
-                return provided;
-            }
 
-            @Override
-            public Object getPrincipal() {
-                return "api-key";
-            }
-        };
-        auth.setAuthenticated(true);
-        filterChain.doFilter(request, response);
+        Authentication auth = new UsernamePasswordAuthenticationToken("api-key", null, java.util.List.of());
+        var context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(auth);
+        SecurityContextHolder.setContext(context);
+
+        chain.doFilter(request, response);
     }
 }
