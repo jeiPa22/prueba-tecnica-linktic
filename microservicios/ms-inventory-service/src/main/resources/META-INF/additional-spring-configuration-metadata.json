@@ -1,0 +1,39 @@
+{
+  "properties": [
+    {
+      "name": "inventory.security.header",
+      "type": "java.lang.String",
+      "description": "llave del header para la seguridad"
+    },
+    {
+      "name": "inventory.security.expectedKey",
+      "type": "java.lang.String",
+      "description": "Valor esperado de la clave API"
+    },
+    {
+      "name": "inventory.products.baseUrl",
+      "type": "java.lang.String",
+      "description": "URL base de Products"
+    },
+    {
+      "name": "inventory.products.apiKeyHeader",
+      "type": "java.lang.String",
+      "description": "Header para la clave API de Products"
+    },
+    {
+      "name": "inventory.products.apiKey",
+      "type": "java.lang.String",
+      "description": "Clave API para Products"
+    },
+    {
+      "name": "inventory.products.timeouts.connectMillis",
+      "type": "java.lang.Integer",
+      "description": "conectar el tiempo de espera (ms)"
+    },
+    {
+      "name": "inventory.products.timeouts.readMillis",
+      "type": "java.lang.Integer",
+      "description": "tiempo de espera de lectura (ms)"
+    }
+  ]
+}

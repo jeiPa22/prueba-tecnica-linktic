@@ -6,8 +6,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import com.acme.inventory.src.infraestructure.jsonapi.ErrorDocument;
-import com.acme.inventory.src.infraestructure.jsonapi.ErrorObject;
+import com.acme.inventory.project.infraestructure.jsonapi.ErrorDocument;
+import com.acme.inventory.project.infraestructure.jsonapi.ErrorObject;
 
 import java.util.List;
 
