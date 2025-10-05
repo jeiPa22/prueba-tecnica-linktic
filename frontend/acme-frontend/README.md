@@ -46,3 +46,6 @@ Compila la aplicación para producción en la carpeta `dist`.
 ### `npm test`
 
 Ejecuta los tests de la aplicación en modo interactivo.
+
+### Resultados pruebas.
+<img width="1912" height="924" alt="image" src="https://github.com/user-attachments/assets/299dc059-a2ca-4f40-8704-bdf9f09d884b" />
