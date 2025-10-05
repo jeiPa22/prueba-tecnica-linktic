@@ -1,6 +1,5 @@
 package com.acme.inventory.src.infraestructure.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -8,34 +7,27 @@ import org.springframework.web.client.RestClient;
 
 import java.time.Duration;
 
+/**
+ * Configuración del cliente REST para comunicarse con otros servicios.
+ */
 @Configuration
 public class RestClientConfig {
-
     /**
-     * Configura y proporciona un RestClient para comunicarse con el servicio 
+     * Configura un RestClient para comunicarse con el servicio de productos.
      * 
-     * @param baseUrl       la URL base del servicio de productos
-     * @param apiKeyHeader  el nombre del encabezado para la clave API
-     * @param apiKey        la clave API para autenticación
-     * @param connectMillis el tiempo máximo de conexión en milisegundos
-     * @param readMillis    el tiempo máximo de lectura en milisegundos
-     * @return un RestClient configurado para comunicarse con el servicio de
-     *         productos
+     * @param props Las propiedades de configuración del servicio de productos.
+     * @return Un RestClient configurado para comunicarse con el servicio de
+     *         productos.
      */
     @Bean
-    RestClient productsRestClient(
-            @Value("${inventory.products.baseUrl}") String baseUrl,
-            @Value("${inventory.products.apiKeyHeader}") String apiKeyHeader,
-            @Value("${inventory.products.apiKey}") String apiKey,
-            @Value("${inventory.products.timeouts.connectMillis}") int connectMillis,
-            @Value("${inventory.products.timeouts.readMillis}") int readMillis) {
+    RestClient productsRestClient(InventoryProductsProperties props) {
         var factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(Duration.ofMillis(connectMillis));
-        factory.setReadTimeout(Duration.ofMillis(readMillis));
+        factory.setConnectTimeout(Duration.ofMillis(props.getTimeouts().getConnectMillis()));
+        factory.setReadTimeout(Duration.ofMillis(props.getTimeouts().getReadMillis()));
         return RestClient.builder()
-                .baseUrl(baseUrl)
+                .baseUrl(props.getBaseUrl())
                 .requestFactory(factory)
-                .defaultHeaders(h -> h.set(apiKeyHeader, apiKey))
+                .defaultHeaders(h -> h.set(props.getApiKeyHeader(), props.getApiKey()))
                 .build();
     }
 }
