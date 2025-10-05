@@ -1,3 +1,6 @@
+# Resultados Pruebas.
+<img width="1912" height="924" alt="image" src="https://github.com/user-attachments/assets/60aa8591-7f58-4fdc-8e91-ed67ba317454" />
+
 # Descripción
 Microservicio de gestión de productos que expone CRUD con respuestas en formato JSON:API y documentación OpenAPI/Swagger UI.
 
