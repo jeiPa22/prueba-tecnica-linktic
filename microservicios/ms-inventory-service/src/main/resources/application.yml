@@ -72,18 +72,15 @@ spring:
     url: jdbc:postgresql://inventory-db:5432/postgres
     username: postgres
     password: postgres
-    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: validate
+      default_schema: inventory
     open-in-view: false
-    properties:
-      hibernate:
-        default_schema: inventory
   flyway:
     enabled: true
     default-schema: inventory
-    schemas: inventory,public
+    schemas: inventory
     create-schemas: true
     table: flyway_schema_history_inventory
 
