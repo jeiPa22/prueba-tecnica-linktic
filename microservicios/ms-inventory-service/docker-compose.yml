@@ -1,38 +1,37 @@
 services:
-  app:
+  inventory-app:
     build:
       context: .
       dockerfile: Dockerfile
     image: acme/inventory-service:latest
+    container_name: inventory-app
     depends_on:
-      db:
+      inventory-db:
         condition: service_healthy
     environment:
-      # Spring DataSource
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://inventory-db:5432/postgres
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
 
-      # Puerto de la app
       SERVER_PORT: "8081"
 
-      # Flyway: aislar esquema e historial para evitar conflicto con otros MS
       SPRING_FLYWAY_DEFAULT_SCHEMA: inventory
       SPRING_FLYWAY_SCHEMAS: inventory
       SPRING_FLYWAY_CREATE_SCHEMAS: "true"
       SPRING_FLYWAY_TABLE: flyway_schema_history_inventory
 
-      # Swagger/OpenAPI (opcional)
-      SPRINGDOC_API_DOCS_ENABLED: "true"
-      SPRINGDOC_SWAGGER_UI_ENABLED: "true"
+      # Cliente hacia Products (si corre en el mismo Compose/red)
+      INVENTORY_PRODUCTS_BASE_URL: http://products-app:8080
+      INVENTORY_PRODUCTS_API_KEY_HEADER: X-API-KEY
+      INVENTORY_PRODUCTS_API_KEY: products-secret
 
-      # API Key (si usas el mismo esquema de seguridad)
-      PRODUCTS_API_KEY: products-secret
     ports:
       - "8081:8081"
 
-  db:
+  inventory-db:
     image: postgres:15-alpine
+    container_name: inventory-postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -43,7 +42,9 @@ services:
       timeout: 20s
       retries: 5
     ports:
-      - "5432:5432"
+      - "5434:5432"
+    volumes:
+      - pgdata_inventory:/var/lib/postgresql/data
 
 volumes:
-  db:
+  pgdata_inventory:

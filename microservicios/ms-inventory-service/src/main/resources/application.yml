@@ -1,25 +1,36 @@
+# Perfil activo por defecto (puedes omitirlo y activar por env)
+spring:
+  profiles:
+    active: local
+
+# ---------------- Perfil: local ----------------
+# Ejecutando la app en el host, DB publicada en 5434 y Products en localhost:8080
+---
 server:
   port: 8081
 
-logging:
-  structured:
-    format:
-      console: json
-      
 spring:
+  config:
+    activate:
+      on-profile: local
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://localhost:5434/postgres
     username: postgres
     password: postgres
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: validate
     open-in-view: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: inventory
   flyway:
     enabled: true
+    default-schema: inventory
+    schemas: inventory,public
+    create-schemas: true
+    table: flyway_schema_history_inventory
 
 springdoc:
   api-docs:
@@ -27,24 +38,77 @@ springdoc:
   swagger-ui:
     enabled: true
 
-resilience4j:
-  retry:
-    instances:
-      products:
-        max-attempts: 3
-        wait-duration: 200ms
-        retry-exceptions:
-          - org.springframework.web.client.HttpServerErrorException
-          - java.net.SocketTimeoutException
-  circuitbreaker:
-    instances:
-      products:
-        sliding-window-type: COUNT_BASED
-        sliding-window-size: 10
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 5s
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info
+inventory:
+  products:
+    base-url: http://localhost:8080
+    api-key-header: X-API-KEY
+    api-key: ${PRODUCTS_API_KEY:products-secret}
+    timeouts:
+      connect-millis: 5000
+      read-millis: 10000
+
+logging:
+  structured:
+    format:
+      console: ecs
+    ecs:
+      service:
+        name: inventory-service
+        version: "1"
+  level:
+    root: INFO
+
+# ---------------- Perfil: docker ----------------
+# Ejecutando la app dentro de Docker Compose; DB como inventory-db:5432 y Products como products-app:8080
+---
+server:
+  port: 8081
+
+spring:
+  config:
+    activate:
+      on-profile: docker
+  datasource:
+    url: jdbc:postgresql://inventory-db:5432/postgres
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        default_schema: inventory
+  flyway:
+    enabled: true
+    default-schema: inventory
+    schemas: inventory,public
+    create-schemas: true
+    table: flyway_schema_history_inventory
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+inventory:
+  products:
+    base-url: http://products-app:8080
+    api-key-header: X-API-KEY
+    api-key: ${PRODUCTS_API_KEY:products-secret}
+    timeouts:
+      connect-millis: 5000
+      read-millis: 10000
+
+logging:
+  structured:
+    format:
+      console: ecs
+    ecs:
+      service:
+        name: inventory-service
+        version: "1"
+  level:
+    root: INFO

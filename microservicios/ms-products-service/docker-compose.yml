@@ -1,38 +1,37 @@
 services:
-  app:
+  products-app:
     build:
       context: .
+      dockerfile: Dockerfile
     image: acme/products-service:latest
     container_name: products-app
     depends_on:
-      db:
+      products-db:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-postgres}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      PRODUCTS_API_KEY: ${PRODUCTS_API_KEY:-products-secret}
-      SERVER_PORT: 8080
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://products-db:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
     ports:
       - "8080:8080"
 
-  db:
+  products-db:
     image: postgres:15-alpine
     container_name: products-postgres
-    restart: always
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-postgres}
-    ports:
-      - "5432:5432"
+    environment:      
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 20s
       retries: 5
+    ports:
+      - "5433:5432"
     volumes:
-      - db:/var/lib/postgresql/data
+      - pgdata_products:/var/lib/postgresql/data
 
 volumes:
-  db:
+  pgdata_products:
