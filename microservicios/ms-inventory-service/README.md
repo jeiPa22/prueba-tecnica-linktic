@@ -1,3 +1,6 @@
+# Resultados Pruebas
+<img width="1875" height="958" alt="image" src="https://github.com/user-attachments/assets/37cb3331-0adf-403c-b546-344ec7661eb5" />
+
 # Descripción
 - Microservicio de inventario que gestiona existencias y consulta productos, documentado con OpenAPI/Swagger UI y respuestas JSON legibles.
 - Incluye migraciones con Flyway, perfiles “local” y “docker”, y logs estructurados en formato ECS para observabilidad.
