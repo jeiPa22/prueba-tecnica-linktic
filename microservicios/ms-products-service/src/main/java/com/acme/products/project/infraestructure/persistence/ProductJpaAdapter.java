@@ -50,12 +50,16 @@ public class ProductJpaAdapter implements LoadProduct, SaveProduct, SearchProduc
     /**
      * Busca productos por nombre y estado, con paginación.
      * Si el nombre es nulo, se considera una cadena vacía.
-     * Si el estado es nulo, se considera "ACTIVE".
      */
     @Override
     public Page<Product> search(String name, String status, Pageable pageable) {
-        var n = name == null ? "" : name;
-        var s = status == null ? "ACTIVE" : status.toUpperCase();
-        return repo.findByNameContainingIgnoreCaseAndStatus(n, s, pageable).map(ProductMapper::toDomain);
+        var n = (name == null) ? "" : name; // "" con Containing = sin filtro de nombre
+        if (status == null || status.isBlank()) {
+            return repo.findByNameContainingIgnoreCase(n, pageable)
+                    .map(ProductMapper::toDomain);
+        }
+        var s = status.toUpperCase();
+        return repo.findByNameContainingIgnoreCaseAndStatus(n, s, pageable)
+                .map(ProductMapper::toDomain);
     }
 }

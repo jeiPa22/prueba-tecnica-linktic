@@ -19,4 +19,13 @@ public interface ProductJpaRepository extends JpaRepository<ProductEntity, Strin
      * @return Página de productos que coinciden con los criterios de búsqueda.
      */
     Page<ProductEntity> findByNameContainingIgnoreCaseAndStatus(String name, String status, Pageable pageable);
+
+    /**
+     * Busca productos por nombre (contiene, sin distinguir mayúsculas),
+     * 
+     * @param name     Nombre o parte del nombre del producto a buscar.
+     * @param pageable Información de paginación.
+     * @return Página de productos que coinciden con los criterios de búsqueda.
+     */
+    Page<ProductEntity> findByNameContainingIgnoreCase(String name, Pageable pageable);
 }
