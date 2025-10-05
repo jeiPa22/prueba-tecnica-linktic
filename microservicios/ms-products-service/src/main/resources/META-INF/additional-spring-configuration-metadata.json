@@ -1,0 +1,14 @@
+{
+  "properties": [
+    {
+      "name": "products.security.header",
+      "type": "java.lang.String",
+      "description": "Http nombre de la cabecera para la API key"
+    },
+    {
+      "name": "products.security.expectedKey",
+      "type": "java.lang.String",
+      "description": "Valor esperado de la API key"
+    }
+  ]
+}

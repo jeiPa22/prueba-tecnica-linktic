@@ -1,4 +1,4 @@
-package com.acme.products_service;
+package com.acme.products;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
