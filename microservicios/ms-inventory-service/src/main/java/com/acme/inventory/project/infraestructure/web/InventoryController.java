@@ -17,7 +17,7 @@ import com.acme.inventory.project.infraestructure.jsonapi.ResourceObject;
  * Controlador del inventario
  */
 @RestController
-@RequestMapping(value = "/api/inventory", produces = "application/vnd.api+json", consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/inventory", produces = "application/vnd.api+json", consumes = MediaType.APPLICATION_JSON_VALUE)
 public class InventoryController {
     /**
      * el caso de uso para consultar el stock

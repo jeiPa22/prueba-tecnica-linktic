@@ -1,6 +1,11 @@
 server:
   port: 8081
 
+logging:
+  structured:
+    format:
+      console: json
+      
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres

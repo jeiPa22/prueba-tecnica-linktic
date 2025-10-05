@@ -8,6 +8,9 @@ import com.acme.inventory.project.application.port.out.LoadInventory;
 import com.acme.inventory.project.application.port.out.SaveInventory;
 import com.acme.inventory.project.domain.model.Stock;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class UpdateStockService implements UpdateStock {
     /**
@@ -22,6 +25,11 @@ public class UpdateStockService implements UpdateStock {
      * Servicio para verificar la existencia de productos
      */
     private final FetchProductById products;
+
+    /**
+     * Logger para la clase
+     */
+    private static final Logger log = LoggerFactory.getLogger(UpdateStockService.class);
 
     /**
      * Constructor de la clase
@@ -47,6 +55,9 @@ public class UpdateStockService implements UpdateStock {
         var current = load.findByProductId(productId)
                 .orElseGet(() -> new Stock(productId, 0, java.time.Instant.now()));
         var updated = current.withQuantity(quantity);
-        return save.save(updated);
+        var saved = save.save(updated);
+        log.info("inventory.changed productId={} beforeQty={} afterQty={}",
+                productId, current.getQuantity(), saved.getQuantity());
+        return saved;
     }
 }
