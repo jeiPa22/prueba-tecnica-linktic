@@ -6,7 +6,7 @@ import ProductsPage from "./pages/ProductsPage";
  */
 function App() {
   /**
-   * rendectiza la pagina de productos
+   * renderiza la pagina de productos
    */
   return <ProductsPage />;
 }
