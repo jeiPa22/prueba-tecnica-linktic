@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import static org.springframework.security.config.Customizer.withDefaults;
 
 import com.acme.inventory.project.infraestructure.config.InventorySecurityProperties;
 
@@ -30,7 +31,7 @@ public class SecurityConfig {
          */
         @Bean
         SecurityFilterChain filterChain(HttpSecurity http, InventorySecurityProperties props) throws Exception {
-                return http
+                return http.cors(withDefaults())
                                 .csrf(csrf -> csrf.disable())
                                 .authorizeHttpRequests(reg -> reg
                                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**",

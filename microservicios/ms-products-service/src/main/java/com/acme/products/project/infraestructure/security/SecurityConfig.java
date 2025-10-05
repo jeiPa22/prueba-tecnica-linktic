@@ -3,8 +3,12 @@ package com.acme.products.project.infraestructure.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 import com.acme.products.project.infraestructure.config.ProductsSecurityProperties;
 
@@ -16,7 +20,22 @@ import jakarta.servlet.http.HttpServletResponse;
  * entrantes.
  */
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
+        @Bean
+        CorsConfigurationSource corsConfigurationSource() {
+                var cfg = new org.springframework.web.cors.CorsConfiguration();
+                cfg.setAllowedOrigins(java.util.List.of("http://localhost:5173"));
+                cfg.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+                cfg.setAllowedHeaders(java.util.List.of("Accept", "Content-Type", "X-API-KEY", "Authorization"));
+                cfg.setExposedHeaders(java.util.List.of("Location"));
+                cfg.setAllowCredentials(false);
+                cfg.setMaxAge(3600L);
+                var source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/api/**", cfg);
+                return source;
+        }
+
         /**
          * Configura la cadena de filtros de seguridad.
          * Deshabilita CSRF, permite el acceso a la documentación de la API
@@ -31,6 +50,7 @@ public class SecurityConfig {
         @Bean
         SecurityFilterChain filterChain(HttpSecurity http, ProductsSecurityProperties props) throws Exception {
                 return http
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                                 .csrf(csrf -> csrf.disable())
                                 .authorizeHttpRequests(reg -> reg
                                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**",
@@ -44,4 +64,5 @@ public class SecurityConfig {
                                                 UsernamePasswordAuthenticationFilter.class)
                                 .build();
         }
+
 }
