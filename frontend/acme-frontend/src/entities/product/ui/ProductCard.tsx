@@ -11,13 +11,13 @@ export function ProductCard({ item }: { item: ProductResource }) {
    * Atributos del producto
    */
   const a = item.attributes;
-  
+
   /**
    * Renderizado del componente
    */
   return (
-    <Card variant="outlined">
-      <CardContent>
+    <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      <CardContent sx={{ flexGrow: 1 }}>
         <Typography variant="subtitle1">{a.name}</Typography>
         <Typography variant="body2">
           {a.currency} {a.price.toLocaleString()}
